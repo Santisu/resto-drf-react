@@ -1,16 +1,34 @@
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from app_auth.serializers import UserSerializer, UserRegisterSerializer
 from exceptions.exceptions import BadRequestException
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class AuthService():
     def register(self, request) -> dict:
-        pass
+        serializer = UserRegisterSerializer(data=request.data)
+        if not serializer.is_valid():
+            raise BadRequestException(serializer.errors)
+        password = serializer.validated_data['password']
+        email = serializer.validated_data['email']
+        if User.objects.filter(email=email).exists():
+            raise BadRequestException({"email": ["Este correo electrónico ya está registrado."]})
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            raise BadRequestException(e.messages)
+        user = User.objects.create_user(email=email, password=password)
+        new_user = UserSerializer(user)
+        return new_user.data
     
     def login(self, request) -> dict:
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
         if not user:
             raise BadRequestException('Usuario o contraseña inválidos')
         refresh = RefreshToken.for_user(user)
