@@ -27,12 +27,17 @@ class PlatoCantidadPrecio(models.Model):
 
 class Boleta(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
-    total_boleta = models.IntegerField()
+    total_sin_descuento = models.IntegerField(null=True)
+    total_descuentos = models.IntegerField(null=True)
+    total_boleta = models.IntegerField(null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class RegistroVenta(models.Model):
-    plato = models.ForeignKey(Plato, on_delete=models.CASCADE)
     cantidad = models.IntegerField()
-    valor_total = models.IntegerField()
+    total_sin_descuento = models.IntegerField()
+    descuento = models.IntegerField()
+    total_registro = models.IntegerField()
+    plato = models.ForeignKey(Plato, on_delete=models.CASCADE)
     boleta = models.ForeignKey(Boleta, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
