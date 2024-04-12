@@ -40,10 +40,9 @@ class PrecioView(APIView):
         return Response(plato_precios, status=status.HTTP_200_OK)
     
 class VentaVIew(APIView):
-    venta_service = VentaService()
-    # def __init__(self, **kwargs: Any) -> None:
-    #     self.venta_service = VentaService()
-    #     super().__init__(**kwargs)
+    def __init__(self, **kwargs: Any) -> None:
+        self.venta_service = VentaService()
+        super().__init__(**kwargs)
         
     def post(self, request):
         venta = self.venta_service.create_venta(request)
