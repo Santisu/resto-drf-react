@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Plato, PlatoCantidadPrecio, RegistroVenta, Boleta
+from .models import Plato, PlatoCantidadPrecio, BoletaDetalle, BoletaGeneral
 
 # Register your models here.
 admin.site.register(Plato)
 admin.site.register(PlatoCantidadPrecio)
-admin.site.register(RegistroVenta)
-admin.site.register(Boleta)
+admin.site.register(BoletaDetalle)
+admin.site.register(BoletaGeneral)
 
