@@ -11,6 +11,14 @@ class Plato(models.Model):
     
     def __str__(self):
         return f"{self.id} - {self.nombre}"
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'nombre': self.nombre,
+            'descripcion': self.descripcion,
+            'is_active': self.is_active
+        }
 
 class PlatoCantidadPrecio(models.Model):
     plato = models.ForeignKey(Plato, on_delete=models.CASCADE)
@@ -22,22 +30,31 @@ class PlatoCantidadPrecio(models.Model):
     def __str__(self):
         return f"{self.id} - {self.plato} - {self.cantidad} x ${self.precio}"
     
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'cantidad': self.cantidad,
+            'precio': self.precio,
+            'is_active': self.is_active
+        }
+    
     class Meta:
         unique_together = [['plato', 'cantidad']]
 
-class Boleta(models.Model):
+class BoletaGeneral(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     total_sin_descuento = models.IntegerField(null=True)
     total_descuentos = models.IntegerField(null=True)
     total_boleta = models.IntegerField(null=True)
+    pagada = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-class RegistroVenta(models.Model):
+class BoletaDetalle(models.Model):
     cantidad = models.IntegerField()
     total_sin_descuento = models.IntegerField()
     descuento = models.IntegerField()
     total_registro = models.IntegerField()
     plato = models.ForeignKey(Plato, on_delete=models.CASCADE)
-    boleta = models.ForeignKey(Boleta, on_delete=models.CASCADE)
+    boleta = models.ForeignKey(BoletaGeneral, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
