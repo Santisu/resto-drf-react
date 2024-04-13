@@ -47,3 +47,7 @@ class VentaVIew(APIView):
     def post(self, request):
         venta = self.venta_service.create_venta(request)
         return Response(venta, status=status.HTTP_201_CREATED)
+    
+    def get(self, request, id):
+        ventas = self.venta_service.retrieve_venta(request, id)
+        return Response(ventas, status=status.HTTP_200_OK)
