@@ -46,7 +46,7 @@ class BoletaGeneral(models.Model):
     total_sin_descuento = models.IntegerField(null=True)
     total_descuentos = models.IntegerField(null=True)
     total_boleta = models.IntegerField(null=True)
-    pagada = models.BooleanField(default=True)
+    pagada = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class BoletaDetalle(models.Model):
