@@ -18,7 +18,7 @@ class PlatosView(APIView):
         return Response(platos, status=status.HTTP_200_OK)
     
     def post(self, request):
-        plato = self.platos_service.create_plato(request)
+        plato = self.platos_service.create_plato(request, request.data)
         return Response(plato, status=status.HTTP_201_CREATED)
     
     def put(self, request, id):
@@ -51,3 +51,7 @@ class VentaVIew(APIView):
     def get(self, request, id):
         ventas = self.venta_service.retrieve_venta(request, id)
         return Response(ventas, status=status.HTTP_200_OK)
+    
+    def put(self, request, id):
+        venta = self.venta_service.update_venta(request, id)
+        return Response(venta, status=status.HTTP_200_OK)
