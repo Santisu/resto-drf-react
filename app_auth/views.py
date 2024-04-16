@@ -8,6 +8,7 @@ from rest_framework import status
 from app_auth.serializers import UserSerializer
 from .auth_service import AuthService
 
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
     
