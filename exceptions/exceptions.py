@@ -27,3 +27,7 @@ class DomainExceptions(APIException):
     @staticmethod
     def conflict(message: str):
         return DomainExceptions(detail=message, status_code=status.HTTP_409_CONFLICT)
+    
+    @staticmethod
+    def invalid_token(message: str):
+        return DomainExceptions(detail=message, status_code=status.HTTP_401_UNAUTHORIZED)

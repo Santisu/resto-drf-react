@@ -17,12 +17,13 @@ class LoginView(APIView):
         super().__init__(**kwargs)
         
     def post(self, request) -> JsonResponse:
+        print(request.data)
         tokens = self.auth_service.login(request)
         return Response(tokens, status=status.HTTP_202_ACCEPTED)
         
 class RefreshTokenView(APIView):
     permission_classes = [AllowAny]
-    
+    # authentication_classes = []
     def __init__(self, **kwargs: Any) -> None:
         self.auth_service = AuthService()
         super().__init__(**kwargs)
@@ -30,7 +31,6 @@ class RefreshTokenView(APIView):
     def post(self, request) -> JsonResponse:
         token = self.auth_service.refresh_token(request)
         return Response(token, status=status.HTTP_200_OK)
-    
     
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -42,7 +42,6 @@ class RegisterView(APIView):
     def post(self, request):
         new_user = self.auth_service.register(request)
         return Response(new_user, status=status.HTTP_201_CREATED)
-
 
 class RestrictedView(APIView):
     def get(self, request):

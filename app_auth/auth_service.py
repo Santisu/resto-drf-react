@@ -17,7 +17,7 @@ class AuthService():
         password = serializer.validated_data['password']
         email = serializer.validated_data['email']
         if User.objects.filter(email=email).exists():
-            raise DomainExceptions.bad_request({"email": ["Este correo electrónico ya está registrado."]})
+            raise DomainExceptions.bad_request("Email: Este correo electrónico ya está registrado.")
         try:
             validate_password(password)
         except ValidationError as e:
@@ -41,10 +41,12 @@ class AuthService():
     def refresh_token(self, request) -> dict:
         refresh_token = request.data.get('refresh_token')
         if not refresh_token:
-            raise DomainExceptions.bad_request('refresh_token no proporcionado')
+            raise DomainExceptions.invalid_token('refresh_token no proporcionado')
         try:
             refresh_token = RefreshToken(refresh_token)
             access_token = str(refresh_token.access_token)
-            return {'access_token': access_token}
+            refresh_token = str(refresh_token)
+            return {'access_token': access_token,
+                    'refresh_token': refresh_token}
         except Exception as e:
-            raise DomainExceptions.bad_request('refresh_token inválido o expirado')
+            raise DomainExceptions.invalid_token('refresh_token inválido o expirado')
