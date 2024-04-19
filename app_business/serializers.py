@@ -56,19 +56,23 @@ class VentaUpdateSerializer(serializers.Serializer):
     detalle = DetallesVentaSerializer(many=True, required=False)
         
 def plato_response_dto(plato, solo_precios_activos=False) -> dict[str, Any]:
-    if type(plato) is list:
-        return map(lambda p: plato_response_dto(p, solo_precios_activos=solo_precios_activos), plato)
-    
+    if isinstance(plato, list):
+        return [plato_response_dto_single(p, solo_precios_activos=solo_precios_activos) for p in plato]
+    else:
+        return plato_response_dto_single(plato, solo_precios_activos=solo_precios_activos)
+
+def plato_response_dto_single(plato, solo_precios_activos=False) -> dict[str, Any]:
     plato_dict = plato.to_dict()
     if solo_precios_activos:
-        plato_dict["precios"] = map(lambda precio: precio.to_dict(), plato.platocantidadprecio_set.filter(is_active=True))
+        precios = plato.platocantidadprecio_set.filter(is_active=True)
     else:
-        plato_dict["precios"] = map(lambda precio: precio.to_dict(), plato.platocantidadprecio_set.all())
+        precios = plato.platocantidadprecio_set.all()
+    plato_dict["precios"] = [precio.to_dict() for precio in precios]
     return plato_dict
 
 def boleta_detalle_response_dto(detalle_boleta):
-    if type(detalle_boleta) is list:
-        return map(lambda r: boleta_detalle_response_dto(r), detalle_boleta)
+    if isinstance(detalle_boleta, list):
+        return [boleta_detalle_response_dto(item) for item in detalle_boleta]
     
     return {
         'id': detalle_boleta.id,
@@ -80,8 +84,8 @@ def boleta_detalle_response_dto(detalle_boleta):
     }
     
 def boleta_general_response_dto(boleta):
-    if type(boleta) is list:
-        return map(lambda b: boleta_general_response_dto(b), boleta)
+    if isinstance(boleta, list):
+        return [boleta_general_response_dto(item) for item in boleta]
     
     return {
         'id': boleta.id,

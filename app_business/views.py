@@ -3,11 +3,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .services import PlatosService, PrecioService, VentaService
+from rest_framework.pagination import PageNumberPagination
 
+class CommonPaginator(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 class PlatosView(APIView):    
+    pagination_class = CommonPaginator
+    
     def __init__(self, **kwargs: Any) -> None:
         self.platos_service = PlatosService()
+        self.paginator = CommonPaginator()
         super().__init__(**kwargs)
         
     def get(self, request, id: int = None):
@@ -15,8 +23,9 @@ class PlatosView(APIView):
             plato = self.platos_service.retrieve_plato_by_id(request, id)
             return Response(plato, status=status.HTTP_200_OK)
         platos = self.platos_service.retrieve_platos(request)
-        return Response(platos, status=status.HTTP_200_OK)
-    
+        result_page = self.paginator.paginate_queryset(platos, request)
+        return self.paginator.get_paginated_response(result_page)
+        
     def post(self, request):
         plato = self.platos_service.create_plato(request, request.data)
         return Response(plato, status=status.HTTP_201_CREATED)
