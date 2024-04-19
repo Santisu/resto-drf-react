@@ -11,24 +11,35 @@ import { UserProvider } from "./context/useAuth";
 import { Toaster } from "react-hot-toast";
 import RegisterPage from "./pages/RegisterPage";
 import AuthVerify from "./components/AuthVerify";
+import PlatosPage from "./pages/PlatosPage";
+import { PlatosProvider } from "./context/PlatoProvider";
 
 function App() {
+
   return (
-      <BrowserRouter>
+    <BrowserRouter>
       <UserProvider>
-          
-            <Navigation />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />}></Route>
-            </Routes>
-          
-            <Toaster />
-            <AuthVerify/>
-        </UserProvider> 
-      </BrowserRouter>
+        <div className="container mx-auto my-28 p-3">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route
+              path="/platos"
+              element={
+                <PlatosProvider>
+                  <PlatosPage />
+                </PlatosProvider>
+              }
+            />
+          </Routes>
+          <Toaster />
+          <AuthVerify />
+        </div>
+      </UserProvider>
+    </BrowserRouter>
   );
 }
 
-export default App;
+export default App
