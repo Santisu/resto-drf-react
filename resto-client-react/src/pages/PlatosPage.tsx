@@ -1,5 +1,5 @@
 import { usePlatos } from "../context/PlatoProvider";
-import { PlatoCard } from "../components/PlatoCard";
+import { PlatoCard } from "../components/Platos/PlatoCard";
 import  Button  from "../components/Button";
 export default function PlatosPage() {
   const { platos } = usePlatos();

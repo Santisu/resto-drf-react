@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import Button from "./Button";
-import { usePlatos } from "../context/PlatoProvider";
-import { Plato, Precio } from "../models";
+import Button from "../Button";
+import { usePlatos } from "../../context";
+import { Plato, Precio } from "../../models";
 import PlatoPrecioRow  from "./PlatoPrecioRow";
 import  {PlatoUpdateDialog}  from "./PlatoUpdateDialog";
 import Accordion from "@mui/material/Accordion";

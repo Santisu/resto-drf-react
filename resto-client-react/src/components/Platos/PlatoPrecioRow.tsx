@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { Precio } from "../models";
+import { Precio } from "../../models";
 
 interface Props {
     id: number

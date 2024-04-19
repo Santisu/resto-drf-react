@@ -191,14 +191,14 @@
 
 
 import React, { useEffect, useState } from "react";
-import  Button from "./Button";
+import  Button from "../Button";
 import { TextField } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle"
-import { usePlatos } from "../context/PlatoProvider";
-import { Plato, Precio } from "../models";
+import { usePlatos } from "../../context/PlatoProvider";
+import { Plato, Precio } from "../../models";
 import PlatoPrecioUpdateRow from "./PlatoPrecioUpdateRow";
 
 interface Props {
