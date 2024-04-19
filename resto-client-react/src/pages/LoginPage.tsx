@@ -16,7 +16,6 @@ const LoginPage = ({}: LoginPageProps) => {
     setIsLoading(true);
 
     try {
-      console.log("KSDJASD")
       await loginUser(email, password);
       navigate("/");
     } catch (error) {

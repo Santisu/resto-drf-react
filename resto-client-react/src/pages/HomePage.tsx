@@ -26,6 +26,7 @@ export default function HomePage() {
       )}
       <button onClick={handleClick}>Restricted</button>
       <input type="Bart" />
+
       </>
   )
 }
