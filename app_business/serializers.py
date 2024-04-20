@@ -17,9 +17,9 @@ class PlatoCantidadPrecioResponseSerializer(serializers.ModelSerializer):
         
 class PlatoUpdateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True, required=False)
-    nombre = serializers.CharField(required=False)
-    descripcion = serializers.CharField(required=False)
-    is_active = serializers.BooleanField(required=False)
+    nombre = serializers.CharField(required=False, allow_blank=False)
+    descripcion = serializers.CharField(required=False, allow_blank=False)
+    is_active = serializers.BooleanField(required=False, allow_null=False)
     
     class Meta:
         model = Plato
@@ -62,6 +62,7 @@ def plato_response_dto(plato, solo_precios_activos=False) -> dict[str, Any]:
         return plato_response_dto_single(plato, solo_precios_activos=solo_precios_activos)
 
 def plato_response_dto_single(plato, solo_precios_activos=False) -> dict[str, Any]:
+    plato.refresh_from_db()
     plato_dict = plato.to_dict()
     if solo_precios_activos:
         precios = plato.platocantidadprecio_set.filter(is_active=True)

@@ -32,7 +32,6 @@ class PlatoCantidadPrecio(models.Model):
     
     def to_dict(self):
         return {
-            'id': self.id,
             'cantidad': self.cantidad,
             'precio': self.precio,
             'is_active': self.is_active
