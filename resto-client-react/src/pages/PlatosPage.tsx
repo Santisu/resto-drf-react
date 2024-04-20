@@ -1,15 +1,17 @@
 import { usePlatos } from "../context/PlatoProvider";
 import { PlatoCard } from "../components/Platos/PlatoCard";
-import  Button  from "../components/Button";
+import { PlatoUpdateDialog } from "../components";
 export default function PlatosPage() {
   const { platos } = usePlatos();
 
   return (
     <>
-        <Button texto="Crear plato" tipo="green" onClick={() => {console.log(platos)}}></Button>
+        <PlatoUpdateDialog />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {platos.map((plato) => (
         <PlatoCard key={plato.id} platoObj={plato}></PlatoCard>
       ))}
+      </div>
     </>
   );
 }
