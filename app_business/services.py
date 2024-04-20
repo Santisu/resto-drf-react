@@ -7,6 +7,7 @@ from django.db.models import Prefetch
 
 class PlatosService:
     def __init__(self):
+        self.precio_service = PrecioService()
         pass
 
     def retrieve_platos(self, request) -> list[dict[str, Any]]:
@@ -29,16 +30,19 @@ class PlatosService:
             raise DomainExceptions.bad_request(serializer.errors)
         precio_unitario = serializer.validated_data.pop('precio_unitario')
         plato = Plato.objects.create(**serializer.validated_data, user=request.user)
-        precio = PlatoCantidadPrecio.objects.create(plato=plato, cantidad=1, precio=precio_unitario, user=request.user)
+        precio = PlatoCantidadPrecio.objects.create(plato=plato, cantidad=1, precio=precio_unitario, is_active=True, user=request.user)
         return plato_response_dto(plato)
 
-    def update_plato(self, request, id) -> dict[str, Any]:
-        plato = get_plato(request.user, id)
-        serializer = PlatoUpdateSerializer(plato, data=request.data)
+    def update_plato(self, request, plato_id) -> dict[str, Any]:
+        plato_to_be_update = get_plato(request.user, plato_id)
+        updated_plato = request.data
+        updated_precios = updated_plato.pop('precios', None)
+        serializer = PlatoUpdateSerializer(plato_to_be_update, data=updated_plato)
         if not serializer.is_valid():
             raise DomainExceptions.bad_request(serializer.errors)
-        plato = serializer.save()
-        return plato_response_dto(plato)
+        plato_to_be_update = serializer.save()
+        self.precio_service.update_precio(request.user, updated_precios, plato_id)
+        return plato_response_dto(plato_to_be_update)
 
 
 class PrecioService():
@@ -46,10 +50,10 @@ class PrecioService():
         pass
 
     @transaction.atomic
-    def create_precio(self, request, plato_id):
-        plato = get_plato(request.user, plato_id)
+    def create_precio(self, user, precio_request, plato_id):
+        plato = get_plato(user, plato_id)
 
-        serializer = PlatoCantidadPrecioCreateSerializer(data=request.data)
+        serializer = PlatoCantidadPrecioCreateSerializer(data=precio_request)
         if not serializer.is_valid():
             raise DomainExceptions.bad_request(serializer.errors)
 
@@ -57,7 +61,7 @@ class PrecioService():
         try:
             PlatoCantidadPrecio.objects.create(
                 plato=plato,
-                user=request.user,
+                user=user,
                 **precio_data
             )
         except IntegrityError:
@@ -66,17 +70,19 @@ class PrecioService():
         return plato_response_dto(plato)
 
     @transaction.atomic
-    def update_precio(self, request, plato_id):
-        plato = get_plato(request.user, plato_id)
+    def update_precio(self, user, precio_request, plato_id):
+        if isinstance(precio_request, list):
+            return [self.update_precio(user, item, plato_id) for item in precio_request]
+        plato = get_plato(user, plato_id)
 
-        serializer = PlatoCantidadPrecioUpdateSerializer(data=request.data)
+        serializer = PlatoCantidadPrecioUpdateSerializer(data=precio_request)
         if not serializer.is_valid():
             raise DomainExceptions.bad_request(serializer.errors)
         serializer_data = serializer.validated_data
         try:
             cantidad_precio = plato.platocantidadprecio_set.get(cantidad=serializer_data['cantidad'])
         except PlatoCantidadPrecio.DoesNotExist:
-            return self.create_precio(request, plato_id)
+            return self.create_precio(user, precio_request, plato_id)
         if "precio" in serializer_data:
             cantidad_precio.precio = serializer_data['precio']
         if "is_active" in serializer_data:
