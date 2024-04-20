@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../Button";
 import { usePlatos } from "../../context";
 import { Plato, Precio } from "../../models";
-import PlatoPrecioRow  from "./PlatoPrecioRow";
-import  {PlatoUpdateDialog}  from "./PlatoUpdateDialog";
+import PlatoPrecioRow from "./PlatoPrecioRow";
+import { PlatoUpdateDialog } from "./PlatoUpdateDialog";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
@@ -13,24 +13,26 @@ interface Props {
   platoObj: Plato;
 }
 
-export const PlatoCard: React.FC<Props> = ({ platoObj }) => {
-  const { updatePlato } = usePlatos()
-  
-  useEffect(() => {
+export const PlatoCard: React.FC<Props> = ({ platoObj: initialPlatoObj }) => {
+  const { updatePlato } = usePlatos();
+  const [platoObj, setPlatoObj] = useState<Plato>(initialPlatoObj);
 
-  }, []);
+  useEffect(() => {
+    console.log("platoObj", platoObj);
+    setPlatoObj(initialPlatoObj);
+  }, [initialPlatoObj]);
 
   const updateActive = () => {
     const updatedPlato = { ...platoObj, is_active: !platoObj.is_active };
-    // todo Actualizar plato en servidor
-    updatePlato(updatedPlato); 
+    setPlatoObj(updatedPlato);
+    updatePlato(updatedPlato);
   };
 
   const updatePrecioActive = (updatedPrecio: Precio, index: number) => {
     const updatedPrecios = [...platoObj.precios];
     updatedPrecios[index] = updatedPrecio;
     const updatedPlato = { ...platoObj, precios: updatedPrecios };
-    // todo Actualizar precio en servidor
+    setPlatoObj(updatedPlato);
     updatePlato(updatedPlato);
   };
 
@@ -45,15 +47,15 @@ export const PlatoCard: React.FC<Props> = ({ platoObj }) => {
       <div className="flex justify-between py-4">
         <Button
           onClick={updateActive}
-          texto={platoObj.is_active ? "Inactivo" : "Activo"}
-          tipo={platoObj.is_active ? "red" : "green"}
+          texto={platoObj.is_active ? "Activo" : "Inactivo"}
+          tipo={platoObj.is_active ? "green" : "red"}
         />
         <PlatoUpdateDialog platoObj={platoObj} />
       </div>
 
       <div>
         <Accordion>
-          <AccordionSummary aria-controls="" id="">
+          <AccordionSummary aria-controls="precios" id="precios">
             <div className="flex justify-between w-full">
               <Typography variant="h6">Precio</Typography>
               <Typography variant="h6">Cantidad</Typography>
@@ -61,7 +63,12 @@ export const PlatoCard: React.FC<Props> = ({ platoObj }) => {
           </AccordionSummary>
           <AccordionDetails>
             {platoObj.precios.map((p, index) => (
-              <PlatoPrecioRow key={index} precioObj={p} id={index} updatePrecioActive={updatePrecioActive} />
+              <PlatoPrecioRow
+                key={index}
+                precioObj={p}
+                id={index}
+                updatePrecioActive={updatePrecioActive}
+              />
             ))}
           </AccordionDetails>
         </Accordion>

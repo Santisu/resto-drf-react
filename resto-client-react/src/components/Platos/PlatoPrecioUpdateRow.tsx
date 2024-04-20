@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Precio } from "../../models";
 import TextField from "@mui/material/TextField";
 import Checkbox from "@mui/material/Checkbox";
@@ -7,23 +7,24 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 interface Props {
     index: number;
     precioObj: Precio;
-    updatePrecio: (updatedPrecio: Precio) => void;
+    updatePrecio: (updatedPrecio: Precio, index: number) => void
 }
 
 export default function PlatoPrecioUpdateRow({ precioObj, updatePrecio, index }: Props) {
-  const { precio, cantidad, activo } = precioObj;
+  const { precio, cantidad } = precioObj;
+  const [isActive, setIsActive] = useState(precioObj.is_active); 
 
 
   const handlePrecioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newPrecio = Number(event.target.value);
-    updatePrecio({ ...precioObj, precio: newPrecio });
-  };
+    updatePrecio({ ...precioObj, precio: newPrecio }, index);
+  }
 
-
-  const handleActivoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+const handleActivoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newActivo = event.target.checked;
-    updatePrecio({ ...precioObj, activo: newActivo });
-  };
+    setIsActive(newActivo)
+    updatePrecio({ ...precioObj, is_active: newActivo }, index); 
+};
 
   return (
     <div className="flex">
@@ -58,7 +59,7 @@ export default function PlatoPrecioUpdateRow({ precioObj, updatePrecio, index }:
       <FormControlLabel
         control={
           <Checkbox
-            checked={activo}
+            checked={isActive}
             onChange={handleActivoChange}
             name={`activo-${index}`}
           />
