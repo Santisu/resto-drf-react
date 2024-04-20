@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AuthTokens, RefreshToken } from "../models";
+import { AuthTokens, CreatePlatoRequest, Plato, Precio, RefreshToken } from "../models";
 import { CustomError } from "../errors/CustomError";
 
 const api = "http://localhost:8000/api/";
@@ -106,4 +106,65 @@ export const restrictedView = async() => {
   } catch (error: any) {
     throw new CustomError(error.response.status, error.response.data);
   }
+}
+
+export const postPlato = async(platoCreateRequest: CreatePlatoRequest) => {
+  try {
+    const response = await restrictedApi.post<Plato>(`platos/`,{
+      ...platoCreateRequest
+    });
+    return response.data; 
+  } catch (error: any) {
+    const er = new CustomError(error.response.status, error.response.data);
+    console.log(er.statusCode, er.message)
+    throw er
+  }
+}
+
+export const putPlato = async(plato: Plato)=> {
+  try {
+    const response = await restrictedApi.put<Plato>(`platos/${plato.id}/`,{
+      ...plato
+    });
+    return response.data; 
+  } catch (error: any) {
+    const er = new CustomError(error.response.status, error.response.data);
+    console.log(er.statusCode, er.message)
+    throw er
+  }
+}
+
+
+export const getPlatos = async (): Promise<Plato[]> => {
+  try {
+    let allPlatos: Plato[] = [];
+    let nextUrl = "platos/";
+
+    while (nextUrl) {
+      const response = await restrictedApi.get<{ next: string | null; results: Plato[] }>(nextUrl);
+      allPlatos = [...allPlatos, ...response.data.results]; 
+      nextUrl = response.data.next!;
+    }
+
+    return allPlatos;
+  } catch (error: any) {
+    const er = new CustomError(error.response.status, error.response.data);
+    console.log(er.statusCode, er.message);
+    throw er;
+  }
+};
+
+
+export const updatePrecio = async(precio: Precio, plato: Plato ) => {
+  try {
+    const response = await restrictedApi.put<Plato>(`platos/${plato.id}/precios/`,{
+      ...precio
+    });
+    return response.data; 
+  } catch (error: any) {
+    const er = new CustomError(error.response.status, error.response.data);
+    console.log(er.statusCode, er.message)
+    throw er
+  }
+  
 }
