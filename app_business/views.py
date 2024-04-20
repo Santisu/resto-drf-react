@@ -18,9 +18,9 @@ class PlatosView(APIView):
         self.paginator = CommonPaginator()
         super().__init__(**kwargs)
         
-    def get(self, request, id: int = None):
-        if id:
-            plato = self.platos_service.retrieve_plato_by_id(request, id)
+    def get(self, request, plato_id: int = None):
+        if plato_id:
+            plato = self.platos_service.retrieve_plato_by_id(request, plato_id)
             return Response(plato, status=status.HTTP_200_OK)
         platos = self.platos_service.retrieve_platos(request)
         result_page = self.paginator.paginate_queryset(platos, request)
@@ -30,8 +30,8 @@ class PlatosView(APIView):
         plato = self.platos_service.create_plato(request, request.data)
         return Response(plato, status=status.HTTP_201_CREATED)
     
-    def put(self, request, id):
-        plato = self.platos_service.update_plato(request, id)
+    def put(self, request, plato_id):
+        plato = self.platos_service.update_plato(request, plato_id)
         return Response(plato, status=status.HTTP_200_OK)
     
     
@@ -41,11 +41,11 @@ class PrecioView(APIView):
         super().__init__(**kwargs)
         
     def post(self, request, plato_id):
-        plato_precios = self.precio_service.create_precio(request, plato_id)
+        plato_precios = self.precio_service.create_precio(request.user, request.data, plato_id)
         return Response(plato_precios, status=status.HTTP_201_CREATED)
     
     def put(self, request, plato_id):
-        plato_precios = self.precio_service.update_precio(request, plato_id)
+        plato_precios = self.precio_service.update_precio(request.user, request.data, plato_id)
         return Response(plato_precios, status=status.HTTP_200_OK)
     
 class VentaVIew(APIView):
