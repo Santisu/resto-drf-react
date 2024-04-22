@@ -48,11 +48,13 @@ class DetallesVentaSerializer(serializers.Serializer):
     
 class VentaCreateSerializer(serializers.Serializer):
     is_paid = serializers.BooleanField(required=False)
+    is_delivered = serializers.BooleanField(required=False)
     detalle = DetallesVentaSerializer(many=True)
          
 class VentaUpdateSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True, required=False)
     is_paid = serializers.BooleanField(required=False)
+    is_delivered = serializers.BooleanField(required=False)
     detalle = DetallesVentaSerializer(many=True, required=False)
         
 def plato_response_dto(plato, solo_precios_activos=False) -> dict[str, Any]:
