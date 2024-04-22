@@ -20,18 +20,18 @@ class PlatosView(APIView):
         
     def get(self, request, plato_id: int = None):
         if plato_id:
-            plato = self.platos_service.retrieve_plato_by_id(request, plato_id)
+            plato = self.platos_service.retrieve_plato_by_id(request.user, plato_id)
             return Response(plato, status=status.HTTP_200_OK)
-        platos = self.platos_service.retrieve_platos(request)
+        platos = self.platos_service.retrieve_platos(request.user)
         result_page = self.paginator.paginate_queryset(platos, request)
         return self.paginator.get_paginated_response(result_page)
         
     def post(self, request):
-        plato = self.platos_service.create_plato(request, request.data)
+        plato = self.platos_service.create_plato(request.user, request.data)
         return Response(plato, status=status.HTTP_201_CREATED)
     
     def put(self, request, plato_id):
-        plato = self.platos_service.update_plato(request, plato_id)
+        plato = self.platos_service.update_plato(request.user, request.data, plato_id)
         return Response(plato, status=status.HTTP_200_OK)
     
     
@@ -54,13 +54,13 @@ class VentaVIew(APIView):
         super().__init__(**kwargs)
         
     def post(self, request):
-        venta = self.venta_service.create_venta(request)
+        venta = self.venta_service.create_venta(request.user, request.data)
         return Response(venta, status=status.HTTP_201_CREATED)
     
     def get(self, request, id):
-        ventas = self.venta_service.retrieve_venta(request, id)
+        ventas = self.venta_service.retrieve_venta(request.user, id)
         return Response(ventas, status=status.HTTP_200_OK)
     
-    def put(self, request, id):
-        venta = self.venta_service.update_venta(request, id)
+    def put(self, request, boleta_id):
+        venta = self.venta_service.update_venta(request.user, request.data, boleta_id)
         return Response(venta, status=status.HTTP_200_OK)

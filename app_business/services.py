@@ -10,38 +10,38 @@ class PlatosService:
         self.precio_service = PrecioService()
         pass
 
-    def retrieve_platos(self, request) -> list[dict[str, Any]]:
+    def retrieve_platos(self, user) -> list[dict[str, Any]]:
         platos = Plato.objects.prefetch_related(
             Prefetch('platocantidadprecio_set',
                      queryset=PlatoCantidadPrecio.objects.order_by('cantidad'))
-        ).filter(user=request.user).order_by('-is_active', 'nombre')
+        ).filter(user=user).order_by('-is_active', 'nombre')
         return plato_response_dto(list(platos))
     
-    def retrieve_plato_by_id(self, request, id) -> dict[str, dict[str, Any]]:
-        plato = get_plato(request.user, id)
+    def retrieve_plato_by_id(self, user, id) -> dict[str, dict[str, Any]]:
+        plato = get_plato(user, id)
         return plato_response_dto(plato)
 
     @transaction.atomic
-    def create_plato(self, request, body: dict|list) -> dict[str, Any]:
+    def create_plato(self, user, body: dict|list) -> dict[str, Any]:
         if type(body) is list:
-            return map(lambda p: self.create_plato(request, p), body)
+            return map(lambda p: self.create_plato(user, p), body)
         serializer = PlatoCreateSerializer(data=body)
         if not serializer.is_valid():
             raise DomainExceptions.bad_request(serializer.errors)
         precio_unitario = serializer.validated_data.pop('precio_unitario')
-        plato = Plato.objects.create(**serializer.validated_data, user=request.user)
-        precio = PlatoCantidadPrecio.objects.create(plato=plato, cantidad=1, precio=precio_unitario, is_active=True, user=request.user)
+        plato = Plato.objects.create(**serializer.validated_data, user=user)
+        precio = PlatoCantidadPrecio.objects.create(plato=plato, cantidad=1, precio=precio_unitario, is_active=True, user=user)
         return plato_response_dto(plato)
 
-    def update_plato(self, request, plato_id) -> dict[str, Any]:
-        plato_to_be_update = get_plato(request.user, plato_id)
-        updated_plato = request.data
+    def update_plato(self, user, data, plato_id) -> dict[str, Any]:
+        plato_to_be_update = get_plato(user, plato_id)
+        updated_plato = data
         updated_precios = updated_plato.pop('precios', None)
         serializer = PlatoUpdateSerializer(plato_to_be_update, data=updated_plato)
         if not serializer.is_valid():
             raise DomainExceptions.bad_request(serializer.errors)
         plato_to_be_update = serializer.save()
-        self.precio_service.update_precio(request.user, updated_precios, plato_id)
+        self.precio_service.update_precio(user, updated_precios, plato_id)
         return plato_response_dto(plato_to_be_update)
 
 
@@ -109,14 +109,14 @@ class VentaService():
         pass
 
     @transaction.atomic
-    def create_venta(self, request):
-        venta = VentaCreateSerializer(data=request.data)
+    def create_venta(self, user, data):
+        venta = VentaCreateSerializer(data=data)
         if not venta.is_valid():
             raise DomainExceptions.bad_request(venta.errors)
         is_pagada = venta.validated_data.get('pagada', False)
         detalle_list = venta.validated_data["detalle"]        
         # Crear la boleta
-        boleta_general = BoletaGeneral(user=request.user, pagada=is_pagada)
+        boleta_general = BoletaGeneral(user=user, pagada=is_pagada)
         boleta_general.save()
         # Crear los registros de venta
         boleta_general = self.create_or_update_boleta_detalle(boleta_general, detalle_list)        
@@ -124,20 +124,20 @@ class VentaService():
         boleta_general = self.update_boleta(boleta_general)
         return boleta_completa_response_dto(boleta_general)
     
-    def retrieve_venta(self, request, id):
-        boleta = get_boleta(request, id)
+    def retrieve_venta(self, user, id):
+        boleta = get_boleta(user, id)
         return boleta_completa_response_dto(boleta)
     
     @transaction.atomic
-    def update_venta(self, request, id):
-        serializer = VentaUpdateSerializer(data=request.data)
+    def update_venta(self, user, data, id):
+        serializer = VentaUpdateSerializer(data=data)
         if not serializer.is_valid():
             raise DomainExceptions.bad_request(serializer.errors)
         
-        boleta = get_boleta(request, id)
+        boleta = get_boleta(user, id)
         serializer_data = serializer.validated_data
         if "pagada" in serializer_data:
-            boleta.pagada = serializer_data['pagada']
+            boleta.is_paid = serializer_data['pagada']
         if "detalle" in serializer_data:
             detalle_venta = serializer_data["detalle"]
             boleta = self.create_or_update_boleta_detalle(boleta, detalle_venta)
@@ -227,9 +227,9 @@ def get_plato(user, id):
         raise DomainExceptions.not_found("Plato no encontrado")
     return plato
 
-def get_boleta(request, id):
+def get_boleta(user, id):
     try:
-        boleta = BoletaGeneral.objects.prefetch_related("boletadetalle_set").get(id=id, user=request.user)
+        boleta = BoletaGeneral.objects.prefetch_related("boletadetalle_set").get(id=id, user=user)
     except BoletaGeneral.DoesNotExist:
         raise DomainExceptions.not_found("Boleta no encontrada")
     return boleta

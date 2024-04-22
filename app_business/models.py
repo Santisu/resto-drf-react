@@ -45,14 +45,15 @@ class BoletaGeneral(models.Model):
     total_sin_descuento = models.IntegerField(null=True)
     total_descuentos = models.IntegerField(null=True)
     total_boleta = models.IntegerField(null=True)
-    pagada = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
+    is_delivered = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class BoletaDetalle(models.Model):
     cantidad = models.IntegerField()
-    total_sin_descuento = models.IntegerField()
+    registro_sin_descuento = models.IntegerField()
     descuento = models.IntegerField()
-    total_registro = models.IntegerField()
+    registro_total = models.IntegerField()
     plato = models.ForeignKey(Plato, on_delete=models.CASCADE)
     boleta = models.ForeignKey(BoletaGeneral, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

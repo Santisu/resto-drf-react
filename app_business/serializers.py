@@ -47,12 +47,12 @@ class DetallesVentaSerializer(serializers.Serializer):
     cantidad = serializers.IntegerField()
     
 class VentaCreateSerializer(serializers.Serializer):
-    pagada = serializers.BooleanField(required=False)
+    is_paid = serializers.BooleanField(required=False)
     detalle = DetallesVentaSerializer(many=True)
          
 class VentaUpdateSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True, required=False)
-    pagada = serializers.BooleanField(required=False)
+    is_paid = serializers.BooleanField(required=False)
     detalle = DetallesVentaSerializer(many=True, required=False)
         
 def plato_response_dto(plato, solo_precios_activos=False) -> dict[str, Any]:
@@ -79,9 +79,9 @@ def boleta_detalle_response_dto(detalle_boleta):
         'id': detalle_boleta.id,
         'plato': plato_response_dto(detalle_boleta.plato, solo_precios_activos=True),
         'cantidad': detalle_boleta.cantidad,
-        'total_sin_descuento': detalle_boleta.total_sin_descuento,
+        'total_sin_descuento': detalle_boleta.registro_sin_descuento,
         'descuento': detalle_boleta.descuento,
-        'total_registro': detalle_boleta.total_registro
+        'total_registro': detalle_boleta.registro_total
     }
     
 def boleta_general_response_dto(boleta):
@@ -94,7 +94,8 @@ def boleta_general_response_dto(boleta):
         'total_sin_descuento': boleta.total_sin_descuento,
         'total_descuentos': boleta.total_descuentos,
         'total_boleta': boleta.total_boleta,
-        'pagada': boleta.pagada
+        'is_paid': boleta.is_paid,
+        'is_delivered': boleta.is_delivered
     }
     
 def boleta_completa_response_dto(boleta_general, boleta_detalle: list=None):
