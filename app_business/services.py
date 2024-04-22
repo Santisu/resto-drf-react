@@ -115,9 +115,10 @@ class VentaService():
             raise DomainExceptions.bad_request(venta.errors)
         is_pagada = venta.validated_data.get('is_paid', False)
         is_delivered = venta.validated_data.get('is_delivered', False)
+        comentario = venta.validated_data.get('comentario', "")
         detalle_list = venta.validated_data["detalle"]        
         # Crear la boleta
-        boleta_general = BoletaGeneral(user=user, pagada=is_pagada, is_delivered=is_delivered)
+        boleta_general = BoletaGeneral(user=user, pagada=is_pagada, is_delivered=is_delivered, comentario=comentario)
         boleta_general.save()
         # Crear los registros de venta
         boleta_general = self.create_or_update_boleta_detalle(boleta_general, detalle_list)        
@@ -141,6 +142,8 @@ class VentaService():
             boleta.is_paid = serializer_data['is_paid']
         if "is_delivered" in serializer_data:
             boleta.is_delivered = serializer_data['is_delivered']
+        if "comentario" in serializer_data:
+            boleta.comentario = serializer_data['comentario']
         if "detalle" in serializer_data:
             detalle_venta = serializer_data["detalle"]
             boleta = self.create_or_update_boleta_detalle(boleta, detalle_venta)

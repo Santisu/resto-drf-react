@@ -49,12 +49,14 @@ class DetallesVentaSerializer(serializers.Serializer):
 class VentaCreateSerializer(serializers.Serializer):
     is_paid = serializers.BooleanField(required=False)
     is_delivered = serializers.BooleanField(required=False)
+    comentario = serializers.CharField(required=False)
     detalle = DetallesVentaSerializer(many=True)
          
 class VentaUpdateSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True, required=False)
     is_paid = serializers.BooleanField(required=False)
     is_delivered = serializers.BooleanField(required=False)
+    comentario = serializers.CharField(required=False)
     detalle = DetallesVentaSerializer(many=True, required=False)
         
 def plato_response_dto(plato, solo_precios_activos=False) -> dict[str, Any]:
@@ -97,10 +99,13 @@ def boleta_general_response_dto(boleta):
         'total_descuentos': boleta.total_descuentos,
         'total_boleta': boleta.total_boleta,
         'is_paid': boleta.is_paid,
-        'is_delivered': boleta.is_delivered
+        'is_delivered': boleta.is_delivered,
+        'comentario': boleta.comentario,
     }
     
 def boleta_completa_response_dto(boleta_general, boleta_detalle: list=None):
+    if isinstance(boleta_general, list):
+        return [boleta_completa_response_dto(item) for item in boleta_general]
     boleta = boleta_general_response_dto(boleta_general)
     if boleta_detalle:
         boleta["detalle"] = boleta_detalle_response_dto(boleta_detalle)

@@ -47,6 +47,7 @@ class BoletaGeneral(models.Model):
     total_boleta = models.IntegerField(null=True)
     is_paid = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
+    comentario = models.TextField(blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class BoletaDetalle(models.Model):
