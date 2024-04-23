@@ -145,8 +145,19 @@ export const getPlatos = async (): Promise<Plato[]> => {
       allPlatos = [...allPlatos, ...response.data.results]; 
       nextUrl = response.data.next!;
     }
-
     return allPlatos;
+  } catch (error: any) {
+    const er = new CustomError(error.response.status, error.response.data);
+    console.log(er.statusCode, er.message);
+    throw er;
+  }
+};
+
+export const getPlatosRush = async (): Promise<Plato[]> => {
+  const url = "platos/rush/";
+  try {
+    const response = await restrictedApi.get<Plato[]>(url);
+    return response.data;
   } catch (error: any) {
     const er = new CustomError(error.response.status, error.response.data);
     console.log(er.statusCode, er.message);

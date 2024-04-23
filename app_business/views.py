@@ -64,3 +64,14 @@ class VentaVIew(APIView):
     def put(self, request, boleta_id):
         venta = self.venta_service.update_venta(request.user, request.data, boleta_id)
         return Response(venta, status=status.HTTP_200_OK)
+    
+    
+class RushView(APIView):
+    def __init__(self, **kwargs: Any) -> None:
+        self.venta_service = VentaService()
+        self.platos_service = PlatosService()
+        super().__init__(**kwargs)
+    
+    def get(self, request):
+        platos = self.platos_service.retrieve_platos(request.user, rush=True)
+        return Response(platos, status=status.HTTP_200_OK)

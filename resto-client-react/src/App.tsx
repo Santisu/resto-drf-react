@@ -1,9 +1,4 @@
-// import { useState } from 'react'
-import {
-  Route,
-  Routes,
-  BrowserRouter,
-} from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -13,9 +8,10 @@ import RegisterPage from "./pages/RegisterPage";
 import AuthVerify from "./components/AuthVerify";
 import PlatosPage from "./pages/PlatosPage";
 import { PlatosProvider } from "./context/PlatoProvider";
+import { RushProvider } from "./context/RushProvider";
+import RushPage from "./pages/RushPage";
 
 function App() {
-
   return (
     <BrowserRouter>
       <UserProvider>
@@ -33,6 +29,14 @@ function App() {
                 </PlatosProvider>
               }
             />
+            <Route
+              path="/rush"
+              element={
+                <RushProvider>
+                  <RushPage />
+                </RushProvider>
+              }
+            />
           </Routes>
           <Toaster />
           <AuthVerify />
@@ -42,4 +46,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

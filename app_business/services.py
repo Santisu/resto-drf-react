@@ -10,11 +10,19 @@ class PlatosService:
         self.precio_service = PrecioService()
         pass
 
-    def retrieve_platos(self, user) -> list[dict[str, Any]]:
-        platos = Plato.objects.prefetch_related(
-            Prefetch('platocantidadprecio_set',
-                     queryset=PlatoCantidadPrecio.objects.order_by('cantidad'))
-        ).filter(user=user).order_by('-is_active', 'nombre')
+    def retrieve_platos(self, user, rush=False) -> list[dict[str, Any]]:
+        if rush:
+            platos = Plato.objects.prefetch_related(
+                Prefetch('platocantidadprecio_set',
+                        queryset=PlatoCantidadPrecio.objects.order_by('cantidad'))
+            ).filter(user=user, is_active=True ).order_by('nombre')
+        else:
+            platos = Plato.objects.prefetch_related(
+                Prefetch('platocantidadprecio_set',
+                        queryset=PlatoCantidadPrecio.objects.order_by('cantidad'))
+            ).filter(user=user).order_by('-is_active', 'nombre')
+        
+        
         return plato_response_dto(list(platos))
     
     def retrieve_plato_by_id(self, user, id) -> dict[str, dict[str, Any]]:
@@ -174,15 +182,15 @@ class VentaService():
         new_detalle = {detalle['plato_id']: detalle for detalle in detalle_list}
         new_detalle_mutable = new_detalle.copy()
         platos_in_new_detalle = self.get_platos_vendidos(detalle_list)
-        for id, detalle in old_detalle.items():
-            if new_detalle.get(id, False): # Detalle sigue en la boleta
-                self.update_detalle(boleta, new_detalle[id])
-                del new_detalle_mutable[id]
-                del old_detalle_mutable[id]            
-        for id, detalle in new_detalle_mutable.items():
-            plato = platos_in_new_detalle.get(id)     
+        for plato_id, detalle in old_detalle.items():
+            if new_detalle.get(plato_id, False): # Detalle sigue en la boleta
+                self.update_detalle(boleta, new_detalle[plato_id])
+                del new_detalle_mutable[plato_id]
+                del old_detalle_mutable[plato_id]            
+        for plato_id, detalle in new_detalle_mutable.items():
+            plato = platos_in_new_detalle.get(plato_id)     
             self.create_detalle(plato, detalle['cantidad'], boleta)
-        for id, detalle in old_detalle_mutable.items():
+        for plato_id, detalle in old_detalle_mutable.items():
             detalle.delete()    
         return boleta
     

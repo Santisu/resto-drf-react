@@ -27,7 +27,7 @@ import { useAuth } from "../context/useAuth";
 // )
 // }
 
-export default function Navigation() {
+export default function  Navigation() {
   let { user, logout } = useAuth();
 
   return (
@@ -43,6 +43,11 @@ export default function Navigation() {
             <Link to="/platos">
               <div className="p-3 rounded bg-reddy-green text-reddy-white hover:bg-reddy-green-200">
                 Platos
+              </div>
+            </Link>
+            <Link to="/rush">
+              <div className="p-3 rounded bg-reddy-green text-reddy-white hover:bg-reddy-green-200">
+                Rush
               </div>
             </Link>
           </>
